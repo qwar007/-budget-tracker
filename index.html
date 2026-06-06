@@ -58,11 +58,35 @@
   <script>
     const money = v => new Intl.NumberFormat('ru-RU').format(Math.round(Number(v) || 0)) + ' ₽';
     const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-    const state = {
+    const STORAGE_KEY = 'budget-tracker-v2';
+    const defaultState = {
       plan: { salary:150000, advance:80000, food:30000, car:16000, kid:15500, other:12000, savings:5000, fixed:131100 },
       split: { food:{salary:17000, advance:13000}, car:{salary:10000, advance:6000}, kid:{salary:8000, advance:7500}, other:{salary:7000, advance:5000} },
       expenses: []
     };
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return JSON.parse(JSON.stringify(defaultState));
+        const parsed = JSON.parse(raw);
+        return {
+          plan: { ...defaultState.plan, ...(parsed.plan || {}) },
+          split: {
+            food: { ...defaultState.split.food, ...((parsed.split || {}).food || {}) },
+            car: { ...defaultState.split.car, ...((parsed.split || {}).car || {}) },
+            kid: { ...defaultState.split.kid, ...((parsed.split || {}).kid || {}) },
+            other: { ...defaultState.split.other, ...((parsed.split || {}).other || {}) }
+          },
+          expenses: Array.isArray(parsed.expenses) ? parsed.expenses : []
+        };
+      } catch (e) {
+        return JSON.parse(JSON.stringify(defaultState));
+      }
+    }
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+    const state = loadState();
     function currentPeriod() {
       const today = new Date();
       const d = today.getDate();
@@ -94,14 +118,14 @@
       $('#foodSalaryPart').value = state.split.food.salary; $('#foodAdvancePart').value = state.split.food.advance; $('#carSalaryPart').value = state.split.car.salary; $('#carAdvancePart').value = state.split.car.advance; $('#kidSalaryPart').value = state.split.kid.salary; $('#kidAdvancePart').value = state.split.kid.advance; $('#otherSalaryPart').value = state.split.other.salary; $('#otherAdvancePart').value = state.split.other.advance;
     }
     function renderAll() { renderSummary(); renderCards(); renderExpenses(); renderBudget(); syncForms(); }
-    $('#expenseForm').addEventListener('submit', e => { e.preventDefault(); const amount = Number(($('#amount').value||'').replace(/\s+/g,'').replace(',','.')); if (!amount || amount <= 0) return; state.expenses.push({ amount, category:$('#category').value, note:$('#note').value.trim(), date:new Date().toISOString() }); $('#amount').value=''; $('#note').value=''; renderAll(); });
-    $('#clearBtn').addEventListener('click', () => { if (!confirm('Очистить все введённые расходы?')) return; state.expenses = []; renderAll(); });
-    $('#savePlanBtn').addEventListener('click', () => { state.plan.salary=Number($('#salary').value)||0; state.plan.advance=Number($('#advance').value)||0; state.plan.food=Number($('#foodBudget').value)||0; state.plan.car=Number($('#carBudget').value)||0; state.plan.kid=Number($('#kidBudget').value)||0; state.plan.other=Number($('#otherBudget').value)||0; state.plan.savings=Number($('#savingsGoal').value)||0; state.plan.fixed=Number($('#monthlyFixed').value)||0; alert('План обновлён'); renderAll(); });
-    $('#saveSplitBtn').addEventListener('click', () => { state.split.food.salary=Number($('#foodSalaryPart').value)||0; state.split.food.advance=Number($('#foodAdvancePart').value)||0; state.split.car.salary=Number($('#carSalaryPart').value)||0; state.split.car.advance=Number($('#carAdvancePart').value)||0; state.split.kid.salary=Number($('#kidSalaryPart').value)||0; state.split.kid.advance=Number($('#kidAdvancePart').value)||0; state.split.other.salary=Number($('#otherSalaryPart').value)||0; state.split.other.advance=Number($('#otherAdvancePart').value)||0; alert('Разделение бюджета сохранено'); renderAll(); });
+    $('#expenseForm').addEventListener('submit', e => { e.preventDefault(); const amount = Number(($('#amount').value||'').replace(/\s+/g,'').replace(',','.')); if (!amount || amount <= 0) return; state.expenses.push({ amount, category:$('#category').value, note:$('#note').value.trim(), date:new Date().toISOString() }); $('#amount').value=''; $('#note').value=''; saveState(); renderAll(); });
+    $('#clearBtn').addEventListener('click', () => { if (!confirm('Очистить все введённые расходы?')) return; state.expenses = []; saveState(); renderAll(); });
+    $('#savePlanBtn').addEventListener('click', () => { state.plan.salary=Number($('#salary').value)||0; state.plan.advance=Number($('#advance').value)||0; state.plan.food=Number($('#foodBudget').value)||0; state.plan.car=Number($('#carBudget').value)||0; state.plan.kid=Number($('#kidBudget').value)||0; state.plan.other=Number($('#otherBudget').value)||0; state.plan.savings=Number($('#savingsGoal').value)||0; state.plan.fixed=Number($('#monthlyFixed').value)||0; saveState(); alert('План обновлён'); renderAll(); });
+    $('#saveSplitBtn').addEventListener('click', () => { state.split.food.salary=Number($('#foodSalaryPart').value)||0; state.split.food.advance=Number($('#foodAdvancePart').value)||0; state.split.car.salary=Number($('#carSalaryPart').value)||0; state.split.car.advance=Number($('#carAdvancePart').value)||0; state.split.kid.salary=Number($('#kidSalaryPart').value)||0; state.split.kid.advance=Number($('#kidAdvancePart').value)||0; state.split.other.salary=Number($('#otherSalaryPart').value)||0; state.split.other.advance=Number($('#otherAdvancePart').value)||0; saveState(); alert('Разделение бюджета сохранено'); renderAll(); });
     $$('[data-tab]').forEach(btn => btn.addEventListener('click', () => { $$('[data-tab]').forEach(x => x.classList.remove('active')); btn.classList.add('active'); const tab = btn.dataset.tab; $$('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === tab)); }));
     (function(){ const root=document.documentElement; const btn=document.querySelector('[data-theme-toggle]'); let dark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; root.setAttribute('data-theme', dark ? 'dark' : 'light'); btn.addEventListener('click',()=>{ dark=root.getAttribute('data-theme')!=='dark'; root.setAttribute('data-theme', dark ? 'dark' : 'light'); $('#themeIcon').textContent=dark?'☀︎':'◐'; }); $('#themeIcon').textContent=dark?'☀︎':'◐'; })();
     const APP_PIN='2026'; let pinInput=''; const lockScreen=$('#lockScreen'); const pinBoxes=[...document.querySelectorAll('#pinBoxes .pin-box')]; const pinHint=$('#pinHint'); function renderPin(){ pinBoxes.forEach((box,i)=>box.textContent=i<pinInput.length?'•':''); } function verifyPin(){ if(pinInput===APP_PIN){ lockScreen.classList.add('lock-hidden'); } else { pinHint.textContent='Неверный PIN'; pinHint.classList.add('danger'); pinInput=''; renderPin(); } } document.querySelectorAll('[data-key]').forEach(btn=>btn.addEventListener('click',()=>{ if(pinInput.length>=4) return; pinInput+=btn.dataset.key; pinHint.textContent='Введите 4 цифры'; pinHint.classList.remove('danger'); renderPin(); if(pinInput.length===4) verifyPin(); })); $('#clearPin').addEventListener('click',()=>{ pinInput=pinInput.slice(0,-1); renderPin(); }); $('#checkPin').addEventListener('click', verifyPin);
-    renderPin(); renderAll();
+    renderPin(); renderAll(); saveState();
   </script>
 </body>
 </html>
