@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#01696f" />
+  <title>Budget Tracker</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+      --color-bg: #f7f6f2;
+      --color-surface: #f9f8f5;
+      --color-surface-2: #fbfbf9;
+      --color-surface-offset: #edeae5;
+      --color-border: #d4d1ca;
+      --color-text: #28251d;
+      --color-text-muted: #6d6a64;
+      --color-text-faint: #8f8b84;
+      --color-primary: #01696f;
+      --color-primary-hover: #0c4e54;
+      --color-primary-highlight: #cedcd8;
+      --color-warning: #964219;
+      --color-success: #437a22;
+      --color-error: #a12c7b;
+      --radius-sm: 0.5rem; --radius-md: 0.875rem; --radius-lg: 1.25rem; --radius-full: 9999px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md: 0 10px 24px rgba(0,0,0,.08);
+      --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    [data-theme="dark"] {
+      --color-bg: #171614;
+      --color-surface: #1c1b19;
+      --color-surface-2: #201f1d;
+      --color-surface-offset: #2a2825;
+      --color-border: #393836;
+      --color-text: #ece8de;
+      --color-text-muted: #c0bbb1;
+      --color-text-faint: #948f86;
+      --color-primary: #4f98a3;
+      --color-primary-hover: #227f8b;
+      --color-primary-highlight: #313b3b;
+      --color-warning: #e08d5f;
+      --color-success: #84b962;
+      --color-error: #d163a7;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.25);
+      --shadow-md: 0 10px 24px rgba(0,0,0,.3);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: var(--text-base);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+    }
+    button, input, select { font: inherit; }
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      background: var(--color-bg);
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      padding: var(--space-4);
+      background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+    }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+    .logo-wrap { display: flex; align-items: center; gap: var(--space-3); }
+    .logo {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(180deg, var(--color-primary), var(--color-primary-hover));
+      display: grid; place-items: center; color: #fff; box-shadow: var(--shadow-md);
+    }
+    .title { font-size: var(--text-lg); font-weight: 700; }
+    .subtitle { color: var(--color-text-muted); font-size: var(--text-xs); }
+    .icon-btn {
+      min-width: 44px; min-height: 44px; border-radius: 14px; border: 1px solid var(--color-border);
+      background: var(--color-surface); color: var(--color-text); display: grid; place-items: center;
+    }
+    .summary {
+      padding: var(--space-4);
+      display: grid; gap: var(--space-3);
+    }
+    .hero-card {
+      background: linear-gradient(180deg, var(--color-surface), var(--color-surface-2));
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-row { display: flex; align-items: end; justify-content: space-between; gap: var(--space-4); }
+    .muted { color: var(--color-text-muted); }
+    .big-money { font-size: var(--text-xl); font-weight: 700; letter-spacing: -0.03em; }
+    .pill-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-4); }
+    .pill {
+      padding: 0.45rem 0.75rem; border-radius: var(--radius-full); font-size: var(--text-xs);
+      background: var(--color-primary-highlight); color: var(--color-text); border: 1px solid transparent;
+    }
+    .pill.warn { background: color-mix(in srgb, var(--color-warning) 14%, var(--color-surface)); }
+    .pill.ok { background: color-mix(in srgb, var(--color-success) 14%, var(--color-surface)); }
+    .main {
+      padding: 0 var(--space-4) var(--space-8);
+      overflow-y: auto;
+      display: grid;
+      gap: var(--space-4);
+      align-content: start;
+    }
+    .section {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      box-shadow: var(--shadow-sm);
+    }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+    .section-title { font-size: var(--text-lg); font-weight: 700; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+    .stat {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+    }
+    .stat label { display: block; font-size: var(--text-xs); color: var(--color-text-muted); margin-bottom: .2rem; }
+    .stat strong { font-size: var(--text-base); font-weight: 700; }
+    .form-grid { display: grid; gap: var(--space-3); }
+    .field { display: grid; gap: var(--space-2); }
+    .field label { font-size: var(--text-sm); font-weight: 500; }
+    .input, .select {
+      width: 100%; min-height: 48px; border-radius: 14px; border: 1px solid var(--color-border);
+      background: var(--color-surface-2); padding: 0.85rem 0.95rem; color: var(--color-text);
+    }
+    .row { display: flex; gap: var(--space-3); }
+    .row > * { flex: 1; }
+    .btn {
+      min-height: 48px; border-radius: 14px; padding: 0.9rem 1rem; border: 1px solid transparent; font-weight: 700;
+    }
+    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-secondary { background: var(--color-surface-2); border-color: var(--color-border); color: var(--color-text); }
+    .list { display: grid; gap: var(--space-3); }
+    .item {
+      display: grid; grid-template-columns: 1fr auto; gap: var(--space-2);
+      padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface-2); border: 1px solid var(--color-border);
+    }
+    .item-top { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+    .badge { padding: .25rem .55rem; border-radius: var(--radius-full); font-size: var(--text-xs); }
+    .badge.food { background: color-mix(in srgb, var(--color-success) 14%, var(--color-surface)); }
+    .badge.car { background: color-mix(in srgb, var(--color-warning) 14%, var(--color-surface)); }
+    .badge.kid { background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)); }
+    .badge.other { background: color-mix(in srgb, var(--color-error) 12%, var(--color-surface)); }
+    .amount { font-weight: 700; white-space: nowrap; }
+    .tiny { font-size: var(--text-xs); color: var(--color-text-muted); }
+    .progress {
+      height: 10px; background: var(--color-surface-offset); border-radius: var(--radius-full); overflow: hidden; margin-top: var(--space-2);
+    }
+    .progress > span { display: block; height: 100%; background: var(--color-primary); border-radius: inherit; }
+    .tabs {
+      position: sticky; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(4,1fr); gap: var(--space-2);
+      padding: var(--space-3) var(--space-4) calc(var(--space-3) + var(--safe-bottom));
+      background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+    }
+    .tab {
+      min-height: 52px; border-radius: 16px; border: 1px solid transparent; background: transparent; color: var(--color-text-muted);
+      display: grid; place-items: center; gap: 2px; font-size: 11px; padding: .45rem;
+    }
+    .tab.active { color: var(--color-text); background: var(--color-surface); border-color: var(--color-border); }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .hint {
+      padding: var(--space-3); border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface));
+      font-size: var(--text-sm); color: var(--color-text);
+    }
+    .danger { color: var(--color-error); }
+    .success { color: var(--color-success); }
+    .empty { text-align: center; padding: var(--space-8) var(--space-4); color: var(--color-text-muted); }
+    .install-box { margin-top: var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted); }
+    @media (min-width: 700px) {
+      .app { max-width: 540px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topline">
+        <div class="logo-wrap">
+          <div class="logo" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-label="Budget logo">
+              <path d="M5 8h14"></path><path d="M7 5h10v14H7z"></path><path d="M9.5 12h5"></path><path d="M12 9.5v5"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="title">Budget Tracker</div>
+            <div class="subtitle">Расходы, лимиты и контроль месяца</div>
+          </div>
+        </div>
+        <button class="icon-btn" type="button" data-theme-toggle aria-label="Сменить тему">
+          <span id="themeIcon">◐</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="summary">
+      <div class="hero-card">
+        <div class="hero-row">
+          <div>
+            <div class="muted tiny">Остаток месяца</div>
+            <div class="big-money" id="balanceText">0 ₽</div>
+          </div>
+          <div class="tiny muted" id="monthLabel">Текущий месяц</div>
+        </div>
+        <div class="pill-row">
+          <div class="pill">Доходы: <span id="incomeText">0 ₽</span></div>
+          <div class="pill warn">План: <span id="planText">0 ₽</span></div>
+          <div class="pill ok">Накоплено: <span id="savedText">0 ₽</span></div>
+        </div>
+        <div class="install-box">На iPhone открой в Safari → Поделиться → «На экран Домой».[web:5][web:14]</div>
+      </div>
+    </section>
+
+    <main class="main">
+      <section class="screen active" data-screen="today">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">Сегодня</div>
+            <div class="tiny" id="todaySpent">Потрачено: 0 ₽</div>
+          </div>
+          <div class="grid2">
+            <div class="stat"><label>Продукты</label><strong id="foodLeft">0 ₽</strong></div>
+            <div class="stat"><label>Авто</label><strong id="carLeft">0 ₽</strong></div>
+            <div class="stat"><label>Ребёнок</label><strong id="kidLeft">0 ₽</strong></div>
+            <div class="stat"><label>Другое</label><strong id="otherLeft">0 ₽</strong></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-head"><div class="section-title">Быстрый расход</div></div>
+          <form id="expenseForm" class="form-grid">
+            <div class="field">
+              <label for="amount">Сумма</label>
+              <input id="amount" class="input" inputmode="numeric" placeholder="Например, 850" required>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="category">Категория</label>
+                <select id="category" class="select">
+                  <option value="food">Продукты</option>
+                  <option value="car">Машина</option>
+                  <option value="kid">Ребёнок</option>
+                  <option value="other">Другое</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="note">Комментарий</label>
+                <input id="note" class="input" placeholder="Магазин, бензин, подгузники">
+              </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Добавить расход</button>
+          </form>
+        </div>
+        <div class="section">
+          <div class="section-head"><div class="section-title">Последние операции</div><button id="clearBtn" class="btn btn-secondary" type="button" style="min-height:40px;padding:.55rem .8rem;">Очистить</button></div>
+          <div id="recentList" class="list"></div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="budget">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Лимиты месяца</div></div>
+          <div class="list" id="budgetList"></div>
+        </div>
+        <div class="section">
+          <div class="section-head"><div class="section-title">Подсказка</div></div>
+          <div class="hint">Ты можешь задать лимиты под свою схему: продукты 17 000 ₽ с ЗП и 13 000 ₽ с аванса; авто — отдельным резервом; ребёнок — отдельной строкой.</div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="plan">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Доходы месяца</div></div>
+          <div class="form-grid">
+            <div class="row">
+              <div class="field"><label for="salary">ЗП 5-го</label><input id="salary" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="advance">Аванс 20-го</label><input id="advance" class="input" inputmode="numeric"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label for="foodBudget">Продукты</label><input id="foodBudget" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="carBudget">Машина</label><input id="carBudget" class="input" inputmode="numeric"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label for="kidBudget">Ребёнок</label><input id="kidBudget" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="otherBudget">Другое</label><input id="otherBudget" class="input" inputmode="numeric"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label for="savingsGoal">Накопления</label><input id="savingsGoal" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="monthlyFixed">Обязательные платежи</label><input id="monthlyFixed" class="input" inputmode="numeric"></div>
+            </div>
+            <button id="savePlanBtn" class="btn btn-primary" type="button">Сохранить план</button>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-head"><div class="section-title">Кредитка за 2 месяца</div></div>
+          <div class="hint">Если нужно закрыть 60 000 ₽ за 2 месяца, ставь цель 30 000 ₽/мес и смотри остаток месяца после обязательных платежей и повседневных расходов.</div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="tips">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Как пользоваться</div></div>
+          <div class="list">
+            <div class="item"><div><div class="item-top"><strong>1. Заполни план месяца</strong></div><div class="tiny">Доходы, обязательные траты, лимиты по продуктам, авто и ребёнку.</div></div></div>
+            <div class="item"><div><div class="item-top"><strong>2. Добавляй траты сразу</strong></div><div class="tiny">С телефона это занимает 3–5 секунд.</div></div></div>
+            <div class="item"><div><div class="item-top"><strong>3. Смотри остаток</strong></div><div class="tiny">Приложение покажет, сколько осталось по категориям и по месяцу.</div></div></div>
+            <div class="item"><div><div class="item-top"><strong>4. На iPhone работает как веб‑приложение</strong></div><div class="tiny">Добавь на экран Домой через Safari; установка идёт через «Add to Home Screen».[web:5][web:14]</div></div></div>
+            <div class="item"><div><div class="item-top"><strong>5. Важно про данные</strong></div><div class="tiny">Данные хранятся локально в браузере; на iPhone хранилище Safari и установленной иконки может быть раздельным, поэтому после добавления на экран Домой лучше пользоваться уже этой иконкой постоянно.[web:9][web:12]</div></div></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabs" aria-label="Навигация">
+      <button class="tab active" data-tab="today" type="button">Сегодня</button>
+      <button class="tab" data-tab="budget" type="button">Лимиты</button>
+      <button class="tab" data-tab="plan" type="button">План</button>
+      <button class="tab" data-tab="tips" type="button">Инфо</button>
+    </nav>
+  </div>
+
+  <script>
+    const money = v => new Intl.NumberFormat('ru-RU').format(Math.round(Number(v) || 0)) + ' ₽';
+    const monthLabel = document.getElementById('monthLabel');
+    monthLabel.textContent = new Date().toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+
+    const state = {
+      plan: {
+        salary: 150000,
+        advance: 80000,
+        food: 30000,
+        car: 16000,
+        kid: 15500,
+        other: 12000,
+        savings: 5000,
+        fixed: 131100
+      },
+      expenses: []
+    };
+
+    const $ = s => document.querySelector(s);
+    const $$ = s => [...document.querySelectorAll(s)];
+
+    function renderSummary() {
+      const totalIncome = state.plan.salary + state.plan.advance;
+      const totalPlan = state.plan.food + state.plan.car + state.plan.kid + state.plan.other + state.plan.savings + state.plan.fixed;
+      const spent = state.expenses.reduce((a, x) => a + x.amount, 0);
+      const saved = Math.max(totalIncome - totalPlan, 0) + state.plan.savings;
+      const balance = totalIncome - state.plan.fixed - spent;
+      $('#incomeText').textContent = money(totalIncome);
+      $('#planText').textContent = money(totalPlan);
+      $('#savedText').textContent = money(saved);
+      $('#balanceText').textContent = money(balance);
+      $('#todaySpent').textContent = 'Потрачено: ' + money(spent);
+    }
+
+    function leftByCategory(key, budget) {
+      const spent = state.expenses.filter(x => x.category === key).reduce((a, x) => a + x.amount, 0);
+      return budget - spent;
+    }
+
+    function renderCards() {
+      $('#foodLeft').textContent = money(leftByCategory('food', state.plan.food));
+      $('#carLeft').textContent = money(leftByCategory('car', state.plan.car));
+      $('#kidLeft').textContent = money(leftByCategory('kid', state.plan.kid));
+      $('#otherLeft').textContent = money(leftByCategory('other', state.plan.other));
+    }
+
+    function renderExpenses() {
+      const box = $('#recentList');
+      if (!state.expenses.length) {
+        box.innerHTML = '<div class="empty">Пока нет расходов. Добавь первый чек.</div>';
+        return;
+      }
+      box.innerHTML = state.expenses.slice().reverse().map((x, idx) => `
+        <div class="item">
+          <div>
+            <div class="item-top">
+              <span class="badge ${x.category}">${labelCategory(x.category)}</span>
+              <strong>${escapeHtml(x.note || 'Без комментария')}</strong>
+            </div>
+            <div class="tiny">${new Date(x.date).toLocaleString('ru-RU')}</div>
+          </div>
+          <div class="amount">${money(x.amount)}</div>
+        </div>
+      `).join('');
+    }
+
+    function labelCategory(cat) {
+      return ({ food:'Продукты', car:'Машина', kid:'Ребёнок', other:'Другое' })[cat] || 'Другое';
+    }
+
+    function renderBudget() {
+      const rows = [
+        ['Продукты', 'food', state.plan.food],
+        ['Машина', 'car', state.plan.car],
+        ['Ребёнок', 'kid', state.plan.kid],
+        ['Другое', 'other', state.plan.other]
+      ];
+      $('#budgetList').innerHTML = rows.map(([label, key, budget]) => {
+        const spent = state.expenses.filter(x => x.category === key).reduce((a, x) => a + x.amount, 0);
+        const left = budget - spent;
+        const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+        const tone = left < 0 ? 'danger' : left < budget * 0.2 ? 'danger' : 'success';
+        return `
+          <div class="item" style="grid-template-columns:1fr;">
+            <div class="item-top" style="justify-content:space-between;">
+              <strong>${label}</strong>
+              <span class="amount ${tone}">${money(left)}</span>
+            </div>
+            <div class="tiny">План ${money(budget)} · Потрачено ${money(spent)}</div>
+            <div class="progress"><span style="width:${pct}%;"></span></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function syncForm() {
+      $('#salary').value = state.plan.salary;
+      $('#advance').value = state.plan.advance;
+      $('#foodBudget').value = state.plan.food;
+      $('#carBudget').value = state.plan.car;
+      $('#kidBudget').value = state.plan.kid;
+      $('#otherBudget').value = state.plan.other;
+      $('#savingsGoal').value = state.plan.savings;
+      $('#monthlyFixed').value = state.plan.fixed;
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderCards();
+      renderExpenses();
+      renderBudget();
+      syncForm();
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
+    }
+
+    $('#expenseForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const amount = Number(($('#amount').value || '').replace(/\s+/g, '').replace(',', '.'));
+      if (!amount || amount <= 0) return;
+      state.expenses.push({
+        amount,
+        category: $('#category').value,
+        note: $('#note').value.trim(),
+        date: new Date().toISOString()
+      });
+      $('#amount').value = '';
+      $('#note').value = '';
+      renderAll();
+    });
+
+    $('#savePlanBtn').addEventListener('click', () => {
+      state.plan.salary = Number($('#salary').value) || 0;
+      state.plan.advance = Number($('#advance').value) || 0;
+      state.plan.food = Number($('#foodBudget').value) || 0;
+      state.plan.car = Number($('#carBudget').value) || 0;
+      state.plan.kid = Number($('#kidBudget').value) || 0;
+      state.plan.other = Number($('#otherBudget').value) || 0;
+      state.plan.savings = Number($('#savingsGoal').value) || 0;
+      state.plan.fixed = Number($('#monthlyFixed').value) || 0;
+      renderAll();
+      alert('План обновлён');
+    });
+
+    $('#clearBtn').addEventListener('click', () => {
+      if (!confirm('Очистить все введённые расходы?')) return;
+      state.expenses = [];
+      renderAll();
+    });
+
+    $$('[data-tab]').forEach(btn => btn.addEventListener('click', () => {
+      $$('[data-tab]').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      $$('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === tab));
+    }));
+
+    (function(){
+      const root = document.documentElement;
+      const btn = document.querySelector('[data-theme-toggle]');
+      let dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', dark ? 'dark' : 'light');
+      btn.addEventListener('click', () => {
+        dark = root.getAttribute('data-theme') !== 'dark';
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        document.getElementById('themeIcon').textContent = dark ? '☀︎' : '◐';
+      });
+      document.getElementById('themeIcon').textContent = dark ? '☀︎' : '◐';
+    })();
+
+    renderAll();
+  </script>
+</body>
+</html>
