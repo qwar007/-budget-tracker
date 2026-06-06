@@ -1,131 +1,509 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="light">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#01696f" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
   <title>Budget Tracker</title>
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <style>
-    :root, [data-theme="light"] { --text-xs: clamp(0.75rem,0.7rem + 0.25vw,0.875rem); --text-sm: clamp(0.875rem,0.8rem + 0.35vw,1rem); --text-base: clamp(1rem,0.95rem + 0.25vw,1.125rem); --text-lg: clamp(1.125rem,1rem + 0.75vw,1.5rem); --text-xl: clamp(1.5rem,1.2rem + 1.25vw,2.25rem); --space-1:0.25rem; --space-2:0.5rem; --space-3:0.75rem; --space-4:1rem; --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem; --color-bg:#f7f6f2; --color-surface:#f9f8f5; --color-surface-2:#fbfbf9; --color-surface-offset:#edeae5; --color-border:#d4d1ca; --color-text:#28251d; --color-text-muted:#6d6a64; --color-primary:#01696f; --color-primary-hover:#0c4e54; --color-primary-highlight:#cedcd8; --color-warning:#964219; --color-success:#437a22; --color-error:#a12c7b; --radius-md:0.875rem; --radius-lg:1.25rem; --radius-full:9999px; --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 10px 24px rgba(0,0,0,.08); --font-body:'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif; --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); }
-    [data-theme="dark"] { --color-bg:#171614; --color-surface:#1c1b19; --color-surface-2:#201f1d; --color-surface-offset:#2a2825; --color-border:#393836; --color-text:#ece8de; --color-text-muted:#c0bbb1; --color-primary:#4f98a3; --color-primary-hover:#227f8b; --color-primary-highlight:#313b3b; --color-warning:#e08d5f; --color-success:#84b962; --color-error:#d163a7; --shadow-sm:0 1px 2px rgba(0,0,0,.25); --shadow-md:0 10px 24px rgba(0,0,0,.3); }
-    * { box-sizing:border-box; margin:0; padding:0; } html, body { min-height:100%; } body { font-family:var(--font-body); background:var(--color-bg); color:var(--color-text); font-size:var(--text-base); line-height:1.45; -webkit-font-smoothing:antialiased; padding-top:var(--safe-top); padding-bottom:var(--safe-bottom); } button, input, select { font:inherit; }
-    .lock-screen { position:fixed; inset:0; z-index:100; background:color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter:blur(16px); display:grid; place-items:center; padding:var(--space-4); }
-    .lock-card,.section,.hero-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); }
-    .lock-card { width:100%; max-width:420px; padding:var(--space-6); display:grid; gap:var(--space-4); box-shadow:var(--shadow-md); }
-    .pin-boxes { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-3); } .pin-box { min-height:56px; border-radius:16px; border:1px solid var(--color-border); background:var(--color-surface-2); display:grid; place-items:center; font-size:1.6rem; font-weight:700; }
-    .keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-3); } .key { min-height:56px; border-radius:16px; border:1px solid var(--color-border); background:var(--color-surface-2); color:var(--color-text); font-weight:700; } .lock-hidden { display:none!important; }
-    .app { max-width:520px; margin:0 auto; min-height:100dvh; display:grid; grid-template-rows:auto auto 1fr auto; }
-    .topbar { position:sticky; top:0; z-index:20; padding:var(--space-4); background:color-mix(in srgb, var(--color-bg) 88%, transparent); backdrop-filter:blur(14px); border-bottom:1px solid color-mix(in srgb, var(--color-border) 70%, transparent); }
-    .topline,.section-head,.hero-row,.item-top { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); }
-    .logo-wrap { display:flex; align-items:center; gap:var(--space-3); } .logo { width:40px; height:40px; border-radius:12px; background:linear-gradient(180deg,var(--color-primary),var(--color-primary-hover)); display:grid; place-items:center; color:#fff; box-shadow:var(--shadow-md); }
-    .title { font-size:var(--text-lg); font-weight:700; } .subtitle,.tiny,.muted { color:var(--color-text-muted); } .tiny { font-size:var(--text-xs); }
-    .icon-btn,.btn,.input,.select,.tab { border-radius:14px; } .icon-btn { min-width:44px; min-height:44px; border:1px solid var(--color-border); background:var(--color-surface); color:var(--color-text); display:grid; place-items:center; }
-    .summary { padding:var(--space-4); display:grid; gap:var(--space-3); } .hero-card { padding:var(--space-5); background:linear-gradient(180deg,var(--color-surface),var(--color-surface-2)); }
-    .big-money { font-size:var(--text-xl); font-weight:700; letter-spacing:-0.03em; } .pill-row { display:flex; gap:var(--space-2); flex-wrap:wrap; margin-top:var(--space-4); }
-    .pill { padding:0.45rem 0.75rem; border-radius:var(--radius-full); font-size:var(--text-xs); background:var(--color-primary-highlight); } .pill.warn { background:color-mix(in srgb, var(--color-warning) 14%, var(--color-surface)); } .pill.ok { background:color-mix(in srgb, var(--color-success) 14%, var(--color-surface)); }
-    .main { padding:0 var(--space-4) var(--space-8); overflow-y:auto; display:grid; gap:var(--space-4); align-content:start; } .section { padding:var(--space-4); } .section-title { font-size:var(--text-lg); font-weight:700; }
-    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-3); } .stat,.item { background:var(--color-surface-2); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:var(--space-3); }
-    .stat label { display:block; font-size:var(--text-xs); color:var(--color-text-muted); margin-bottom:.2rem; } .stat strong,.amount { font-weight:700; }
-    .form-grid { display:grid; gap:var(--space-3); } .field { display:grid; gap:var(--space-2); } .field label { font-size:var(--text-sm); font-weight:500; } .row { display:flex; gap:var(--space-3); } .row > * { flex:1; }
-    .input,.select,.btn { min-height:48px; border:1px solid var(--color-border); background:var(--color-surface-2); padding:0.85rem 0.95rem; color:var(--color-text); width:100%; } .btn { font-weight:700; } .btn-primary { background:var(--color-primary); color:white; border-color:transparent; } .btn-secondary { background:var(--color-surface-2); }
-    .list { display:grid; gap:var(--space-3); } .item { display:grid; grid-template-columns:1fr auto; gap:var(--space-2); } .badge { padding:.25rem .55rem; border-radius:var(--radius-full); font-size:var(--text-xs); }
-    .badge.food { background:color-mix(in srgb, var(--color-success) 14%, var(--color-surface)); } .badge.car { background:color-mix(in srgb, var(--color-warning) 14%, var(--color-surface)); } .badge.kid { background:color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)); } .badge.other { background:color-mix(in srgb, var(--color-error) 12%, var(--color-surface)); }
-    .progress { height:10px; background:var(--color-surface-offset); border-radius:var(--radius-full); overflow:hidden; margin-top:var(--space-2); } .progress > span { display:block; height:100%; background:var(--color-primary); }
-    .tabs { position:sticky; bottom:0; z-index:20; display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-2); padding:var(--space-3) var(--space-4) calc(var(--space-3) + var(--safe-bottom)); background:color-mix(in srgb, var(--color-bg) 90%, transparent); backdrop-filter:blur(14px); border-top:1px solid color-mix(in srgb, var(--color-border) 70%, transparent); }
-    .tab { min-height:52px; border:1px solid transparent; background:transparent; color:var(--color-text-muted); display:grid; place-items:center; font-size:11px; } .tab.active { color:var(--color-text); background:var(--color-surface); border-color:var(--color-border); }
-    .screen { display:none; } .screen.active { display:block; } .hint { padding:var(--space-3); border-radius:var(--radius-md); background:color-mix(in srgb, var(--color-primary) 9%, var(--color-surface)); font-size:var(--text-sm); } .danger { color:var(--color-error); } .success { color:var(--color-success); } .empty { text-align:center; padding:var(--space-8) var(--space-4); color:var(--color-text-muted); }
+    :root {
+      --bg: #f6f5f1;
+      --card: #ffffff;
+      --card2: #f1efea;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d6d3d1;
+      --primary: #0f766e;
+      --danger: #b91c1c;
+      --ok: #15803d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 560px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(246,245,241,.95);
+      backdrop-filter: blur(8px);
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .title { font-size: 24px; font-weight: 700; }
+    .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      margin: 16px;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .mini {
+      background: var(--card2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .mini .l { font-size: 12px; color: var(--muted); }
+    .mini .v { font-size: 18px; font-weight: 700; margin-top: 6px; }
+    .section-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 13px; margin-bottom: 6px; color: var(--muted); }
+    .field input, .field select {
+      width: 100%;
+      height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0 12px;
+      background: #fff;
+      font-size: 16px;
+    }
+    button {
+      height: 46px;
+      border: 0;
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .btn-primary { background: var(--primary); color: white; width: 100%; }
+    .btn-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--line); }
+    .list-item {
+      background: var(--card2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    .list-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #dbeafe;
+    }
+    .small { font-size: 12px; color: var(--muted); }
+    .tabs {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      background: rgba(246,245,241,.98);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 8px;
+      padding: 10px 12px 16px;
+    }
+    .tab { background: transparent; border: 1px solid transparent; color: var(--muted); }
+    .tab.active { background: white; color: var(--text); border-color: var(--line); }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .hint { font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .good { color: var(--ok); }
+    .bad { color: var(--danger); }
+    .lock {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: rgba(246,245,241,.98);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .lock-card {
+      width: 100%;
+      max-width: 360px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+    }
+    .pin-dots {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .dot {
+      height: 56px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card2);
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .pad {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <div class="lock-screen" id="lockScreen"><div class="lock-card"><div><div class="section-title">Вход по PIN</div><div class="tiny" style="margin-top:.35rem;">Текущий PIN: <strong>2026</strong>.</div></div><div class="pin-boxes" id="pinBoxes"><div class="pin-box"></div><div class="pin-box"></div><div class="pin-box"></div><div class="pin-box"></div></div><div class="tiny" id="pinHint">Введите 4 цифры</div><div class="keypad"><button class="key" type="button" data-key="1">1</button><button class="key" type="button" data-key="2">2</button><button class="key" type="button" data-key="3">3</button><button class="key" type="button" data-key="4">4</button><button class="key" type="button" data-key="5">5</button><button class="key" type="button" data-key="6">6</button><button class="key" type="button" data-key="7">7</button><button class="key" type="button" data-key="8">8</button><button class="key" type="button" data-key="9">9</button><button class="key" type="button" id="clearPin">⌫</button><button class="key" type="button" data-key="0">0</button><button class="key" type="button" id="checkPin">OK</button></div></div></div>
-  <div class="app">
-    <header class="topbar"><div class="topline"><div class="logo-wrap"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14"></path><path d="M7 5h10v14H7z"></path><path d="M9.5 12h5"></path><path d="M12 9.5v5"></path></svg></div><div><div class="title">Budget Tracker</div><div class="subtitle">Расходы, лимиты и контроль месяца</div></div></div><button class="icon-btn" type="button" data-theme-toggle><span id="themeIcon">◐</span></button></div></header>
-    <section class="summary"><div class="hero-card"><div class="hero-row"><div><div class="tiny muted">Остаток активного периода</div><div class="big-money" id="balanceText">0 ₽</div></div><div class="tiny muted" id="periodLabel">Период</div></div><div class="pill-row"><div class="pill">Лимит периода: <span id="incomeText">0 ₽</span></div><div class="pill warn">План периода: <span id="planText">0 ₽</span></div><div class="pill ok">До след. выплаты: <span id="daysText">0</span></div></div></div></section>
-    <main class="main">
-      <section class="screen active" data-screen="today">
-        <div class="section"><div class="section-head"><div class="section-title">Сегодня</div><div class="tiny" id="todaySpent">Потрачено: 0 ₽</div></div><div class="grid2"><div class="stat"><label>Продукты</label><strong id="foodLeft">0 ₽</strong></div><div class="stat"><label>Авто</label><strong id="carLeft">0 ₽</strong></div><div class="stat"><label>Ребёнок</label><strong id="kidLeft">0 ₽</strong></div><div class="stat"><label>Другое</label><strong id="otherLeft">0 ₽</strong></div></div><div class="hint" style="margin-top:var(--space-3);">Активный лимит считается по дате: с 5 по 19 число берётся часть бюджета от зарплаты, с 20 по 4 число — часть бюджета от аванса.</div></div>
-        <div class="section"><div class="section-head"><div class="section-title">Быстрый расход</div></div><form id="expenseForm" class="form-grid"><div class="field"><label for="amount">Сумма</label><input id="amount" class="input" inputmode="numeric" placeholder="Например, 850"></div><div class="row"><div class="field"><label for="category">Категория</label><select id="category" class="select"><option value="food">Продукты</option><option value="car">Машина</option><option value="kid">Ребёнок</option><option value="other">Другое</option></select></div><div class="field"><label for="note">Комментарий</label><input id="note" class="input" placeholder="Магазин, бензин, подгузники"></div></div><button class="btn btn-primary" type="submit">Добавить расход</button></form></div>
-        <div class="section"><div class="section-head"><div class="section-title">Последние операции</div><button id="clearBtn" class="btn btn-secondary" type="button" style="min-height:40px;padding:.55rem .8rem;">Очистить</button></div><div id="recentList" class="list"></div></div>
-      </section>
-      <section class="screen" data-screen="budget"><div class="section"><div class="section-head"><div class="section-title">Лимиты периода</div></div><div class="list" id="budgetList"></div></div><div class="section"><div class="section-head"><div class="section-title">Разделение бюджета</div></div><div class="form-grid"><div class="row"><div class="field"><label for="foodSalaryPart">Продукты с ЗП</label><input id="foodSalaryPart" class="input" inputmode="numeric"></div><div class="field"><label for="foodAdvancePart">Продукты с аванса</label><input id="foodAdvancePart" class="input" inputmode="numeric"></div></div><div class="row"><div class="field"><label for="carSalaryPart">Авто с ЗП</label><input id="carSalaryPart" class="input" inputmode="numeric"></div><div class="field"><label for="carAdvancePart">Авто с аванса</label><input id="carAdvancePart" class="input" inputmode="numeric"></div></div><div class="row"><div class="field"><label for="kidSalaryPart">Ребёнок с ЗП</label><input id="kidSalaryPart" class="input" inputmode="numeric"></div><div class="field"><label for="kidAdvancePart">Ребёнок с аванса</label><input id="kidAdvancePart" class="input" inputmode="numeric"></div></div><div class="row"><div class="field"><label for="otherSalaryPart">Другое с ЗП</label><input id="otherSalaryPart" class="input" inputmode="numeric"></div><div class="field"><label for="otherAdvancePart">Другое с аванса</label><input id="otherAdvancePart" class="input" inputmode="numeric"></div></div><button id="saveSplitBtn" class="btn btn-primary" type="button">Сохранить разделение</button></div></div></section>
-      <section class="screen" data-screen="plan"><div class="section"><div class="section-head"><div class="section-title">План месяца</div></div><div class="form-grid"><div class="row"><div class="field"><label for="salary">ЗП 5-го</label><input id="salary" class="input" inputmode="numeric"></div><div class="field"><label for="advance">Аванс 20-го</label><input id="advance" class="input" inputmode="numeric"></div></div><div class="row"><div class="field"><label for="foodBudget">Продукты в месяц</label><input id="foodBudget" class="input" inputmode="numeric"></div><div class="field"><label for="carBudget">Машина в месяц</label><input id="carBudget" class="input" inputmode="numeric"></div></div><div class="row"><div class="field"><label for="kidBudget">Ребёнок в месяц</label><input id="kidBudget" class="input" inputmode="numeric"></div><div class="field"><label for="otherBudget">Другое в месяц</label><input id="otherBudget" class="input" inputmode="numeric"></div></div><div class="row"><div class="field"><label for="savingsGoal">Накопления</label><input id="savingsGoal" class="input" inputmode="numeric"></div><div class="field"><label for="monthlyFixed">Обязательные платежи</label><input id="monthlyFixed" class="input" inputmode="numeric"></div></div><button id="savePlanBtn" class="btn btn-primary" type="button">Сохранить план</button></div></div></section>
-      <section class="screen" data-screen="tips"><div class="section"><div class="section-head"><div class="section-title">Как это работает</div></div><div class="list"><div class="item"><div><div class="item-top"><strong>Период 5–19</strong></div><div class="tiny">Берётся лимит с зарплаты, например продукты 17 000 ₽.</div></div></div><div class="item"><div><div class="item-top"><strong>Период 20–4</strong></div><div class="tiny">Берётся лимит с аванса, например продукты 13 000 ₽.</div></div></div><div class="item"><div><div class="item-top"><strong>Учет по дате</strong></div><div class="tiny">Если сегодня 6-е число, приложение показывает остаток только по текущему куску бюджета до 20-го.</div></div></div><div class="item"><div><div class="item-top"><strong>PIN-защита</strong></div><div class="tiny">Это базовая защита от случайного просмотра, а не банковский уровень безопасности.</div></div></div></div></div></section>
-    </main>
-    <nav class="tabs"><button class="tab active" data-tab="today" type="button">Сегодня</button><button class="tab" data-tab="budget" type="button">Лимиты</button><button class="tab" data-tab="plan" type="button">План</button><button class="tab" data-tab="tips" type="button">Инфо</button></nav>
+  <div id="lock" class="lock">
+    <div class="lock-card">
+      <div class="section-title">Вход по PIN</div>
+      <div class="hint">Введите PIN, чтобы открыть бюджет.</div>
+      <div class="pin-dots" id="pinDots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div id="pinMsg" class="small">Введите 4 цифры</div>
+      <div class="pad">
+        <button type="button" data-pin="1">1</button>
+        <button type="button" data-pin="2">2</button>
+        <button type="button" data-pin="3">3</button>
+        <button type="button" data-pin="4">4</button>
+        <button type="button" data-pin="5">5</button>
+        <button type="button" data-pin="6">6</button>
+        <button type="button" data-pin="7">7</button>
+        <button type="button" data-pin="8">8</button>
+        <button type="button" data-pin="9">9</button>
+        <button type="button" id="pinDel">⌫</button>
+        <button type="button" data-pin="0">0</button>
+        <button type="button" id="pinOk">OK</button>
+      </div>
+    </div>
   </div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="title">Budget Tracker</div>
+      <div class="sub">Семейный бюджет по периодам выплат</div>
+    </div>
+
+    <div id="screen-home" class="screen active">
+      <div class="card">
+        <div class="section-title">Остаток периода</div>
+        <div style="font-size:34px;font-weight:800;" id="periodBalance">0 ₽</div>
+        <div class="small" id="periodLabel">Период</div>
+      </div>
+
+      <div class="card">
+        <div class="grid2">
+          <div class="mini"><div class="l">Продукты</div><div class="v" id="foodLeft">0 ₽</div></div>
+          <div class="mini"><div class="l">Авто</div><div class="v" id="carLeft">0 ₽</div></div>
+          <div class="mini"><div class="l">Ребёнок</div><div class="v" id="kidLeft">0 ₽</div></div>
+          <div class="mini"><div class="l">Другое</div><div class="v" id="otherLeft">0 ₽</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Быстрый расход</div>
+        <div class="field"><label>Сумма</label><input id="amount" inputmode="numeric" placeholder="Например, 850"></div>
+        <div class="row">
+          <div class="field"><label>Категория</label><select id="category"><option value="food">Продукты</option><option value="car">Машина</option><option value="kid">Ребёнок</option><option value="other">Другое</option></select></div>
+          <div class="field"><label>Комментарий</label><input id="note" placeholder="Магазин, бензин"></div>
+        </div>
+        <button class="btn-primary" id="addExpense">Добавить расход</button>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div class="section-title" style="margin:0;">Последние расходы</div>
+          <button class="btn-secondary" id="clearExpenses">Очистить</button>
+        </div>
+        <div id="expensesList"></div>
+      </div>
+    </div>
+
+    <div id="screen-limits" class="screen">
+      <div class="card">
+        <div class="section-title">Лимиты периода</div>
+        <div id="limitsList"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Разделение бюджета</div>
+        <div class="row">
+          <div class="field"><label>Продукты с ЗП</label><input id="foodSalaryPart" inputmode="numeric"></div>
+          <div class="field"><label>Продукты с аванса</label><input id="foodAdvancePart" inputmode="numeric"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Авто с ЗП</label><input id="carSalaryPart" inputmode="numeric"></div>
+          <div class="field"><label>Авто с аванса</label><input id="carAdvancePart" inputmode="numeric"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Ребёнок с ЗП</label><input id="kidSalaryPart" inputmode="numeric"></div>
+          <div class="field"><label>Ребёнок с аванса</label><input id="kidAdvancePart" inputmode="numeric"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Другое с ЗП</label><input id="otherSalaryPart" inputmode="numeric"></div>
+          <div class="field"><label>Другое с аванса</label><input id="otherAdvancePart" inputmode="numeric"></div>
+        </div>
+        <button class="btn-primary" id="saveSplit">Сохранить разделение</button>
+      </div>
+    </div>
+
+    <div id="screen-plan" class="screen">
+      <div class="card">
+        <div class="section-title">План месяца</div>
+        <div class="row">
+          <div class="field"><label>ЗП 5-го</label><input id="salary" inputmode="numeric"></div>
+          <div class="field"><label>Аванс 20-го</label><input id="advance" inputmode="numeric"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Продукты</label><input id="foodBudget" inputmode="numeric"></div>
+          <div class="field"><label>Машина</label><input id="carBudget" inputmode="numeric"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Ребёнок</label><input id="kidBudget" inputmode="numeric"></div>
+          <div class="field"><label>Другое</label><input id="otherBudget" inputmode="numeric"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Накопления</label><input id="savingsGoal" inputmode="numeric"></div>
+          <div class="field"><label>Обязательные платежи</label><input id="monthlyFixed" inputmode="numeric"></div>
+        </div>
+        <button class="btn-primary" id="savePlan">Сохранить план</button>
+      </div>
+    </div>
+
+    <div id="screen-info" class="screen">
+      <div class="card">
+        <div class="section-title">Логика бюджета</div>
+        <div class="hint">С 5 по 19 число используется лимит после зарплаты: продукты 17 000 ₽, авто 9 500 ₽, ребёнок 6 000 ₽, другое 7 000 ₽. С 20 по 4 число используется лимит после аванса: продукты 13 000 ₽, авто 6 000 ₽, ребёнок 5 000 ₽, другое 5 000 ₽.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-screen="home">Сегодня</button>
+    <button class="tab" data-screen="limits">Лимиты</button>
+    <button class="tab" data-screen="plan">План</button>
+    <button class="tab" data-screen="info">Инфо</button>
+  </div>
+
   <script>
-    const money = v => new Intl.NumberFormat('ru-RU').format(Math.round(Number(v) || 0)) + ' ₽';
-    const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-    const STORAGE_KEY = 'budget-tracker-v2';
-    const defaultState = {
-      plan: { salary:150000, advance:80000, food:30000, car:16000, kid:15500, other:12000, savings:5000, fixed:131100 },
-      split: { food:{salary:17000, advance:13000}, car:{salary:10000, advance:6000}, kid:{salary:8000, advance:7500}, other:{salary:7000, advance:5000} },
+    var APP_PIN = '2026';
+    var STORAGE_KEY = 'budget-tracker-safe-v1';
+    var defaultState = {
+      plan: { salary:150000, advance:80000, food:30000, car:15500, kid:11000, other:12000, savings:17400, fixed:131100 },
+      split: { food:{salary:17000, advance:13000}, car:{salary:9500, advance:6000}, kid:{salary:6000, advance:5000}, other:{salary:7000, advance:5000} },
       expenses: []
     };
+
+    function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+    function money(v) { return new Intl.NumberFormat('ru-RU').format(Math.round(Number(v) || 0)) + ' ₽'; }
+    function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function loadState() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return JSON.parse(JSON.stringify(defaultState));
-        const parsed = JSON.parse(raw);
-        return {
-          plan: { ...defaultState.plan, ...(parsed.plan || {}) },
-          split: {
-            food: { ...defaultState.split.food, ...((parsed.split || {}).food || {}) },
-            car: { ...defaultState.split.car, ...((parsed.split || {}).car || {}) },
-            kid: { ...defaultState.split.kid, ...((parsed.split || {}).kid || {}) },
-            other: { ...defaultState.split.other, ...((parsed.split || {}).other || {}) }
-          },
-          expenses: Array.isArray(parsed.expenses) ? parsed.expenses : []
-        };
-      } catch (e) {
-        return JSON.parse(JSON.stringify(defaultState));
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return clone(defaultState);
+        var parsed = JSON.parse(raw);
+        var st = clone(defaultState);
+        if (parsed.plan) Object.assign(st.plan, parsed.plan);
+        if (parsed.split && parsed.split.food) Object.assign(st.split.food, parsed.split.food);
+        if (parsed.split && parsed.split.car) Object.assign(st.split.car, parsed.split.car);
+        if (parsed.split && parsed.split.kid) Object.assign(st.split.kid, parsed.split.kid);
+        if (parsed.split && parsed.split.other) Object.assign(st.split.other, parsed.split.other);
+        st.expenses = Array.isArray(parsed.expenses) ? parsed.expenses : [];
+        return st;
+      } catch(e) {
+        return clone(defaultState);
       }
     }
+    var state = loadState();
     function saveState() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
     }
-    const state = loadState();
-    function currentPeriod() {
-      const today = new Date();
-      const d = today.getDate();
-      if (d >= 5 && d < 20) return { key:'salary', label:'Период после ЗП (5–19)', daysLeft: 20 - d };
-      if (d >= 20) {
-        const end = new Date(today.getFullYear(), today.getMonth()+1, 5);
-        return { key:'advance', label:'Период после аванса (20–4)', daysLeft: Math.ceil((end - today)/(1000*60*60*24)) };
+    function periodInfo() {
+      var now = new Date();
+      var d = now.getDate();
+      if (d >= 5 && d < 20) return { key:'salary', label:'Период после ЗП (5–19)' };
+      return { key:'advance', label:'Период после аванса (20–4)' };
+    }
+    function periodBudget(cat) {
+      var p = periodInfo().key;
+      return Number(state.split[cat][p] || 0);
+    }
+    function spentByCategory(cat) {
+      var sum = 0;
+      for (var i = 0; i < state.expenses.length; i++) if (state.expenses[i].category === cat) sum += Number(state.expenses[i].amount || 0);
+      return sum;
+    }
+    function totalSpent() {
+      var sum = 0;
+      for (var i = 0; i < state.expenses.length; i++) sum += Number(state.expenses[i].amount || 0);
+      return sum;
+    }
+    function syncInputs() {
+      document.getElementById('salary').value = state.plan.salary;
+      document.getElementById('advance').value = state.plan.advance;
+      document.getElementById('foodBudget').value = state.plan.food;
+      document.getElementById('carBudget').value = state.plan.car;
+      document.getElementById('kidBudget').value = state.plan.kid;
+      document.getElementById('otherBudget').value = state.plan.other;
+      document.getElementById('savingsGoal').value = state.plan.savings;
+      document.getElementById('monthlyFixed').value = state.plan.fixed;
+      document.getElementById('foodSalaryPart').value = state.split.food.salary;
+      document.getElementById('foodAdvancePart').value = state.split.food.advance;
+      document.getElementById('carSalaryPart').value = state.split.car.salary;
+      document.getElementById('carAdvancePart').value = state.split.car.advance;
+      document.getElementById('kidSalaryPart').value = state.split.kid.salary;
+      document.getElementById('kidAdvancePart').value = state.split.kid.advance;
+      document.getElementById('otherSalaryPart').value = state.split.other.salary;
+      document.getElementById('otherAdvancePart').value = state.split.other.advance;
+    }
+    function renderMain() {
+      var period = periodInfo();
+      var sumBudget = periodBudget('food') + periodBudget('car') + periodBudget('kid') + periodBudget('other');
+      var spent = totalSpent();
+      document.getElementById('periodBalance').textContent = money(sumBudget - spent);
+      document.getElementById('periodLabel').textContent = period.label;
+      document.getElementById('foodLeft').textContent = money(periodBudget('food') - spentByCategory('food'));
+      document.getElementById('carLeft').textContent = money(periodBudget('car') - spentByCategory('car'));
+      document.getElementById('kidLeft').textContent = money(periodBudget('kid') - spentByCategory('kid'));
+      document.getElementById('otherLeft').textContent = money(periodBudget('other') - spentByCategory('other'));
+    }
+    function renderExpenses() {
+      var box = document.getElementById('expensesList');
+      if (!state.expenses.length) {
+        box.innerHTML = '<div class="small" style="margin-top:10px;">Пока нет расходов.</div>';
+        return;
       }
-      return { key:'advance', label:'Период после аванса (20–4)', daysLeft: 5 - d };
+      var names = { food:'Продукты', car:'Машина', kid:'Ребёнок', other:'Другое' };
+      var html = '';
+      for (var i = state.expenses.length - 1; i >= 0; i--) {
+        var x = state.expenses[i];
+        html += '<div class="list-item"><div class="list-top"><div><span class="badge">' + (names[x.category] || 'Другое') + '</span></div><div><strong>' + money(x.amount) + '</strong></div></div><div style="margin-top:8px;">' + esc(x.note || 'Без комментария') + '</div><div class="small" style="margin-top:6px;">' + new Date(x.date).toLocaleString('ru-RU') + '</div></div>';
+      }
+      box.innerHTML = html;
     }
-    function spentByCategory(cat) { return state.expenses.filter(x => x.category === cat).reduce((a,x)=>a+x.amount,0); }
-    function periodBudget(cat) { const p = currentPeriod().key; return state.split[cat][p]; }
-    function renderSummary() {
-      const p = currentPeriod();
-      const periodTotal = ['food','car','kid','other'].reduce((a,k)=>a+periodBudget(k),0);
-      const spent = state.expenses.reduce((a,x)=>a+x.amount,0);
-      $('#periodLabel').textContent = p.label;
-      $('#incomeText').textContent = money(periodTotal);
-      $('#planText').textContent = money(spent);
-      $('#daysText').textContent = p.daysLeft + ' дн.';
-      $('#balanceText').textContent = money(periodTotal - spent);
-      $('#todaySpent').textContent = 'Потрачено в периоде: ' + money(spent);
+    function renderLimits() {
+      var box = document.getElementById('limitsList');
+      var rows = [
+        ['Продукты','food'],
+        ['Авто','car'],
+        ['Ребёнок','kid'],
+        ['Другое','other']
+      ];
+      var html = '';
+      for (var i = 0; i < rows.length; i++) {
+        var label = rows[i][0];
+        var key = rows[i][1];
+        var left = periodBudget(key) - spentByCategory(key);
+        html += '<div class="list-item"><div class="list-top"><div>' + label + '</div><div class="' + (left < 0 ? 'bad' : 'good') + '"><strong>' + money(left) + '</strong></div></div><div class="small" style="margin-top:6px;">Лимит периода ' + money(periodBudget(key)) + '</div></div>';
+      }
+      box.innerHTML = html;
     }
-    function renderCards() { $('#foodLeft').textContent = money(periodBudget('food') - spentByCategory('food')); $('#carLeft').textContent = money(periodBudget('car') - spentByCategory('car')); $('#kidLeft').textContent = money(periodBudget('kid') - spentByCategory('kid')); $('#otherLeft').textContent = money(periodBudget('other') - spentByCategory('other')); }
-    function renderExpenses() { const box = $('#recentList'); if (!state.expenses.length) { box.innerHTML = '<div class="empty">Пока нет расходов. Добавь первый чек.</div>'; return; } box.innerHTML = state.expenses.slice().reverse().map(x => `<div class="item"><div><div class="item-top"><span class="badge ${x.category}">${({food:'Продукты',car:'Машина',kid:'Ребёнок',other:'Другое'})[x.category]}</span><strong>${(x.note||'Без комментария').replace(/[&<>\"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]))}</strong></div><div class="tiny">${new Date(x.date).toLocaleString('ru-RU')}</div></div><div class="amount">${money(x.amount)}</div></div>`).join(''); }
-    function renderBudget() { $('#budgetList').innerHTML = ['food','car','kid','other'].map(k => { const titles = {food:'Продукты',car:'Машина',kid:'Ребёнок',other:'Другое'}; const budget = periodBudget(k); const spent = spentByCategory(k); const left = budget - spent; const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0; return `<div class="item" style="grid-template-columns:1fr;"><div class="item-top"><strong>${titles[k]}</strong><span class="amount ${left < 0 ? 'danger' : 'success'}">${money(left)}</span></div><div class="tiny">Лимит периода ${money(budget)} · Потрачено ${money(spent)}</div><div class="progress"><span style="width:${pct}%;"></span></div></div>`; }).join(''); }
-    function syncForms() {
-      $('#salary').value = state.plan.salary; $('#advance').value = state.plan.advance; $('#foodBudget').value = state.plan.food; $('#carBudget').value = state.plan.car; $('#kidBudget').value = state.plan.kid; $('#otherBudget').value = state.plan.other; $('#savingsGoal').value = state.plan.savings; $('#monthlyFixed').value = state.plan.fixed;
-      $('#foodSalaryPart').value = state.split.food.salary; $('#foodAdvancePart').value = state.split.food.advance; $('#carSalaryPart').value = state.split.car.salary; $('#carAdvancePart').value = state.split.car.advance; $('#kidSalaryPart').value = state.split.kid.salary; $('#kidAdvancePart').value = state.split.kid.advance; $('#otherSalaryPart').value = state.split.other.salary; $('#otherAdvancePart').value = state.split.other.advance;
+    function renderAll() {
+      syncInputs();
+      renderMain();
+      renderExpenses();
+      renderLimits();
     }
-    function renderAll() { renderSummary(); renderCards(); renderExpenses(); renderBudget(); syncForms(); }
-    $('#expenseForm').addEventListener('submit', e => { e.preventDefault(); const amount = Number(($('#amount').value||'').replace(/\s+/g,'').replace(',','.')); if (!amount || amount <= 0) return; state.expenses.push({ amount, category:$('#category').value, note:$('#note').value.trim(), date:new Date().toISOString() }); $('#amount').value=''; $('#note').value=''; saveState(); renderAll(); });
-    $('#clearBtn').addEventListener('click', () => { if (!confirm('Очистить все введённые расходы?')) return; state.expenses = []; saveState(); renderAll(); });
-    $('#savePlanBtn').addEventListener('click', () => { state.plan.salary=Number($('#salary').value)||0; state.plan.advance=Number($('#advance').value)||0; state.plan.food=Number($('#foodBudget').value)||0; state.plan.car=Number($('#carBudget').value)||0; state.plan.kid=Number($('#kidBudget').value)||0; state.plan.other=Number($('#otherBudget').value)||0; state.plan.savings=Number($('#savingsGoal').value)||0; state.plan.fixed=Number($('#monthlyFixed').value)||0; saveState(); alert('План обновлён'); renderAll(); });
-    $('#saveSplitBtn').addEventListener('click', () => { state.split.food.salary=Number($('#foodSalaryPart').value)||0; state.split.food.advance=Number($('#foodAdvancePart').value)||0; state.split.car.salary=Number($('#carSalaryPart').value)||0; state.split.car.advance=Number($('#carAdvancePart').value)||0; state.split.kid.salary=Number($('#kidSalaryPart').value)||0; state.split.kid.advance=Number($('#kidAdvancePart').value)||0; state.split.other.salary=Number($('#otherSalaryPart').value)||0; state.split.other.advance=Number($('#otherAdvancePart').value)||0; saveState(); alert('Разделение бюджета сохранено'); renderAll(); });
-    $$('[data-tab]').forEach(btn => btn.addEventListener('click', () => { $$('[data-tab]').forEach(x => x.classList.remove('active')); btn.classList.add('active'); const tab = btn.dataset.tab; $$('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === tab)); }));
-    (function(){ const root=document.documentElement; const btn=document.querySelector('[data-theme-toggle]'); let dark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; root.setAttribute('data-theme', dark ? 'dark' : 'light'); btn.addEventListener('click',()=>{ dark=root.getAttribute('data-theme')!=='dark'; root.setAttribute('data-theme', dark ? 'dark' : 'light'); $('#themeIcon').textContent=dark?'☀︎':'◐'; }); $('#themeIcon').textContent=dark?'☀︎':'◐'; })();
-    const APP_PIN='2026'; let pinInput=''; const lockScreen=$('#lockScreen'); const pinBoxes=[...document.querySelectorAll('#pinBoxes .pin-box')]; const pinHint=$('#pinHint'); function renderPin(){ pinBoxes.forEach((box,i)=>box.textContent=i<pinInput.length?'•':''); } function verifyPin(){ if(pinInput===APP_PIN){ lockScreen.classList.add('lock-hidden'); } else { pinHint.textContent='Неверный PIN'; pinHint.classList.add('danger'); pinInput=''; renderPin(); } } document.querySelectorAll('[data-key]').forEach(btn=>btn.addEventListener('click',()=>{ if(pinInput.length>=4) return; pinInput+=btn.dataset.key; pinHint.textContent='Введите 4 цифры'; pinHint.classList.remove('danger'); renderPin(); if(pinInput.length===4) verifyPin(); })); $('#clearPin').addEventListener('click',()=>{ pinInput=pinInput.slice(0,-1); renderPin(); }); $('#checkPin').addEventListener('click', verifyPin);
-    renderPin(); renderAll(); saveState();
+    document.getElementById('addExpense').onclick = function() {
+      var amount = Number((document.getElementById('amount').value || '').replace(',', '.'));
+      if (!amount || amount <= 0) return;
+      state.expenses.push({
+        amount: amount,
+        category: document.getElementById('category').value,
+        note: document.getElementById('note').value,
+        date: new Date().toISOString()
+      });
+      document.getElementById('amount').value = '';
+      document.getElementById('note').value = '';
+      saveState();
+      renderAll();
+    };
+    document.getElementById('clearExpenses').onclick = function() {
+      state.expenses = [];
+      saveState();
+      renderAll();
+    };
+    document.getElementById('savePlan').onclick = function() {
+      state.plan.salary = Number(document.getElementById('salary').value || 0);
+      state.plan.advance = Number(document.getElementById('advance').value || 0);
+      state.plan.food = Number(document.getElementById('foodBudget').value || 0);
+      state.plan.car = Number(document.getElementById('carBudget').value || 0);
+      state.plan.kid = Number(document.getElementById('kidBudget').value || 0);
+      state.plan.other = Number(document.getElementById('otherBudget').value || 0);
+      state.plan.savings = Number(document.getElementById('savingsGoal').value || 0);
+      state.plan.fixed = Number(document.getElementById('monthlyFixed').value || 0);
+      saveState();
+      renderAll();
+      alert('План сохранён');
+    };
+    document.getElementById('saveSplit').onclick = function() {
+      state.split.food.salary = Number(document.getElementById('foodSalaryPart').value || 0);
+      state.split.food.advance = Number(document.getElementById('foodAdvancePart').value || 0);
+      state.split.car.salary = Number(document.getElementById('carSalaryPart').value || 0);
+      state.split.car.advance = Number(document.getElementById('carAdvancePart').value || 0);
+      state.split.kid.salary = Number(document.getElementById('kidSalaryPart').value || 0);
+      state.split.kid.advance = Number(document.getElementById('kidAdvancePart').value || 0);
+      state.split.other.salary = Number(document.getElementById('otherSalaryPart').value || 0);
+      state.split.other.advance = Number(document.getElementById('otherAdvancePart').value || 0);
+      saveState();
+      renderAll();
+      alert('Разделение сохранено');
+    };
+    var tabs = document.querySelectorAll('.tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].onclick = function() {
+        for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
+        this.classList.add('active');
+        var screens = document.querySelectorAll('.screen');
+        for (var k = 0; k < screens.length; k++) screens[k].classList.remove('active');
+        document.getElementById('screen-' + this.getAttribute('data-screen')).classList.add('active');
+      };
+    }
+    var pin = '';
+    function drawPin() {
+      var dots = document.querySelectorAll('#pinDots .dot');
+      for (var i = 0; i < dots.length; i++) dots[i].textContent = i < pin.length ? '•' : '';
+    }
+    function checkPin() {
+      if (pin === APP_PIN) {
+        document.getElementById('lock').classList.add('hidden');
+      } else {
+        document.getElementById('pinMsg').textContent = 'Неверный PIN';
+        document.getElementById('pinMsg').className = 'small bad';
+        pin = '';
+        drawPin();
+      }
+    }
+    var pinBtns = document.querySelectorAll('[data-pin]');
+    for (var p = 0; p < pinBtns.length; p++) {
+      pinBtns[p].onclick = function() {
+        if (pin.length >= 4) return;
+        pin += this.getAttribute('data-pin');
+        document.getElementById('pinMsg').textContent = 'Введите 4 цифры';
+        document.getElementById('pinMsg').className = 'small';
+        drawPin();
+        if (pin.length === 4) checkPin();
+      };
+    }
+    document.getElementById('pinDel').onclick = function() { pin = pin.slice(0, -1); drawPin(); };
+    document.getElementById('pinOk').onclick = function() { checkPin(); };
+    drawPin();
+    renderAll();
+    saveState();
   </script>
 </body>
 </html>
