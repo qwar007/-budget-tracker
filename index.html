@@ -320,18 +320,12 @@ function saveAll() {
 
 function loadS() {
   var raw = localStorage.getItem('bgt_' + getMK());
-  S = raw ? JSON.parse(raw) : {mk: getMK(), received: {}, income: 0, exps: []};
-  // Для каждого дохода — начисляем если день пришёл и ещё не начисляли
-  var d = getDay();
-  INCOMES.forEach(function(inc) {
-    if (d >= inc.day && !S.received[inc.id]) {
-      S.received[inc.id] = true;
-      S.income += inc.a;
-    }
-  });
-  saveS();
+  S = raw ? JSON.parse(raw) : {mk: getMK(), exps: []};
+  if (!S.exps) S.exps = [];
 }
-function saveS() { localStorage.setItem('bgt_' + getMK(), JSON.stringify(S)); }
+function saveS() {
+  try { localStorage.setItem('bgt_' + getMK(), JSON.stringify(S)); } catch(e) {}
+}
 
 // ===================== PIN =====================
 var pBuf = '';
@@ -364,12 +358,11 @@ function chkPin() {
 
 // ===================== CALCULATIONS =====================
 function incomeP(p) {
-  if (p === 0) return S.income;
-  var total = 0;
-  INCOMES.forEach(function(inc) {
-    if (inc.p === p && S.received[inc.id]) total += inc.a;
-  });
-  return total;
+  var d = getDay();
+  if (p === 0) {
+    return INCOMES.filter(function(inc){ return d >= inc.day; }).reduce(function(s,i){ return s+i.a; }, 0);
+  }
+  return INCOMES.filter(function(inc){ return inc.p === p && d >= inc.day; }).reduce(function(s,i){ return s+i.a; }, 0);
 }
 function incomeTotal(p) {
   // Плановый доход периода (что должно придти, независимо от received)
@@ -846,7 +839,7 @@ function doExport() {
     klyuch: S.mk,
     eksportirovano: new Date().toISOString(),
     dohody: INCOMES.map(function(inc){ return {nazvanie:inc.n, summa:inc.a, polucheno:!!S.received[inc.id]}; }),
-    itogo_dohod: S.income,
+    itogo_dohod: incomeP(0),
     p1: { dohod:incomeTotal(1), obyazat:fixedP(1), dostupno:freeBudgetP(1) },
     p2: { dohod:incomeTotal(2), obyazat:fixedP(2), dostupno:freeBudgetP(2) },
     kategorii: CATS.map(function(c){
